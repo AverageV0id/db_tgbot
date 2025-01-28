@@ -1,3 +1,5 @@
+from models import User
+
 commands = ('Список комманд(/help, /info, /commands):\n '
             '/start - запустить бота \n '
             '/get_message - отправляет информацию о сообщении \n '
@@ -7,3 +9,12 @@ commands = ('Список комманд(/help, /info, /commands):\n '
             '/graph - вывести картинку нескольких точек (пример /graph 10, 10, 1, y=x*x))'
             '/graphs - вывести картинку нескольких функций (пример /graphs -10 10 1 y=x*x, -10 10 1 y=-x*x))')
 invalid_message = 'Я не понимаю твоё сообщение, используйте /help(/commands, /info) для просмотра списка комманд'
+
+
+def get_users():
+    text_users = ''
+    for user in User:
+        text_users += f'{user.username} | {user.first_name} | {user.last_name} |{user.date_register} | {user.is_Admin}'
+    return text_users
+
+
