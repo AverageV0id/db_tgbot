@@ -14,7 +14,7 @@ invalid_message = 'Я не понимаю твоё сообщение, испо�
 def get_users():
     text_users = ''
     for user in User:
-        text_users += f'{user.username} | {user.first_name} | {user.last_name} |{user.date_register} | {user.is_Admin}'
-    return text_users
+        text_users += f'{user.username} | {user.first_name} | {user.last_name} |{user.date_register} | {user.is_Admin} \n'
+    return str(text_users)
 
 
