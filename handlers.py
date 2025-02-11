@@ -1,10 +1,12 @@
+from collections import UserDict
+
 import telebot
 from datetime import date
 import random
 from models import *
 
 from setting import *
-from texts import get_users
+from texts import get_users, get_todos
 
 bot = telebot.TeleBot(token)
 
@@ -96,7 +98,38 @@ def set_do(message):
 @bot.message_handler(commands=['todo_list'])
 def todo_list(message):
     text = message.text[10::]
-    todo_list = Todo.select().where(Todo.user == message.chat.username | (
-                Todo.user == str(message.chat.first_name) + str(message.chat.last_name)))
-    for todo in todo_list:
-        bot.send_message(message.chat.id, f'Создано Дело: *{todo.name, todo.do}*')
+
+    todo_user = User.select().where((User.username == message.chat.username) | (
+            User.username == str(message.chat.first_name) + str(message.chat.last_name))).get()
+    todo_list = Todo.select().where((Todo.user == todo_user))
+    bot.send_message(message.chat.id, f'Все дела: \n{get_todos(todo_list)}')
+
+
+@bot.message_handler(commands=['todo'])
+def todo(message):
+    try:
+        text = message.text[5::]
+        todo_user = User.select().where((User.username == message.chat.username) | (
+                User.username == str(message.chat.first_name) + str(message.chat.last_name))).get()
+        todo_list = Todo.select().where((Todo.user == todo_user) & (Todo.id == text)).get()
+        todo_list.do = True
+        todo_list.save()
+        bot.send_message(message.chat.id, f'Дело сделано')
+    except Todo.DoesNotExist:
+        bot.send_message(message.chat.id, f'Пользователь не найден')
+
+
+@bot.message_handler(commands=['todo_search_user'])
+def todo_search_user(message):
+    try:
+        text = message.text[17::].strip()
+        admin = User.select().where((User.username == message.chat.username) | (
+                User.username == str(message.chat.first_name) + str(message.chat.last_name))).get()
+        if admin.is_Admin == 1:
+            todo_user = User.select().where((User.username == text) | (User.first_name == text) | (User.last_name == text) | (text == User.first_name + User.last_name)).get()
+            todo_list = Todo.select().where((Todo.user == todo_user))
+            bot.send_message(message.chat.id, f'Все дела: \n{get_todos(todo_list)}')
+        else:
+            bot.send_message(message.chat.id, 'Вы не являетесь Админом')
+    except User.DoesNotExist:
+        bot.send_message(message.chat.id, f'Пользователь не найден')

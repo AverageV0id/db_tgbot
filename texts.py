@@ -1,5 +1,5 @@
 from models import User
-
+from models import Todo
 commands = ('Список комманд(/help, /info, /commands):\n '
             '/start - запустить бота \n '
             '/get_message - отправляет информацию о сообщении \n '
@@ -17,4 +17,8 @@ def get_users():
         text_users += f'{user.username} | {user.first_name} | {user.last_name} |{user.date_register} | {user.is_Admin} \n'
     return str(text_users)
 
-
+def get_todos(filter):
+    text_todos = ''
+    for todo in filter:
+        text_todos += f'{todo.name} | {todo.do}  \n'
+    return str(text_todos)
