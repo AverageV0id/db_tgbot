@@ -1,10 +1,10 @@
 from collections import UserDict
-
 import telebot
 from datetime import date
 import random
-from models import *
 
+from models import *
+from html_parser import *
 from setting import *
 from texts import get_users, get_todos
 
@@ -133,3 +133,18 @@ def todo_search_user(message):
             bot.send_message(message.chat.id, 'Вы не являетесь Админом')
     except User.DoesNotExist:
         bot.send_message(message.chat.id, f'Пользователь не найден')
+
+
+@bot.message_handler(commands=['add_games'])
+def add_games(message):
+    text = message.text[13::].strip()
+    #  добавить ссылку на картинку
+    text_url = f'https://store.steampowered.com/search/?term={text.replace(" ", "+")}'
+    get_games(text_url)
+    bot.send_message(message.chat.id, 'Игры Добавлены')
+@bot.message_handler(commands=['game_list'])
+def game_list(message):
+    for game in Games:
+        bot.send_message(message.chat.id, f'Название: {game.title} \n '
+                                          f'Цена: {game.price} \n '
+                                          f'Бесплатная: {game.is_Free}')
